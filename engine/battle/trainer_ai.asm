@@ -107,7 +107,7 @@ AIMoveChoiceModificationFunctionPointers:
 	dw AIMoveChoiceModification1
 	dw AIMoveChoiceModification2
 	dw AIMoveChoiceModification3
-	dw AIMoveChoiceModification4 ; unused, does nothing
+	dw AIMoveChoiceModification4 
 
 ; discourages moves that cause no damage but only a status ailment if player's mon already has one
 AIMoveChoiceModification1:
@@ -130,6 +130,10 @@ AIMoveChoiceModification1:
 	and a
 	jr nz, .nextMove
 	ld a, [wEnemyMoveEffect]
+	cp SUBSTITUTE_EFFECT
+	ld a, 4
+	call AICheckIfHPBelowFraction
+	jp c, .heavydiscourage ;if not enough hp, heavily discourage substitute
 	push hl
 	push de
 	push bc
@@ -144,6 +148,11 @@ AIMoveChoiceModification1:
 	add $5 ; heavily discourage move
 	ld [hl], a
 	jr .nextMove
+.heavydiscourage
+	ld a, [hl]	
+	add $5 ; heavily discourage move
+	ld [hl], a
+	jp .nextMove
 
 StatusAilmentMoveEffects:
 	db EFFECT_01 ; unused sleep effect
@@ -157,7 +166,7 @@ StatusAilmentMoveEffects:
 ; that fall in-between
 AIMoveChoiceModification2:
 	ld a, [wAILayer2Encouragement]
-	cp $1
+	and a ;cp $1 - this activates layer 2 on 1st turn instead of 2nd turn
 	ret nz
 	ld hl, wBuffer - 1 ; temp move selection array (-1 byte offset)
 	ld de, wEnemyMonMoves ; enemy moves
@@ -173,13 +182,13 @@ AIMoveChoiceModification2:
 	call ReadMove
 	ld a, [wEnemyMoveEffect]
 	cp ATTACK_UP1_EFFECT
-	jr c, .nextMove
+	jr c, .preferMove
 	cp BIDE_EFFECT
-	jr c, .preferMove
-	cp ATTACK_UP2_EFFECT
 	jr c, .nextMove
-	cp POISON_EFFECT
+	cp ATTACK_UP2_EFFECT
 	jr c, .preferMove
+	cp POISON_EFFECT
+	jr c, .nextMove
 	jr .nextMove
 .preferMove
 	dec [hl] ; slightly encourage this move
@@ -189,6 +198,12 @@ AIMoveChoiceModification2:
 ; discourage damaging moves that are ineffective or not very effective against the player's mon,
 ; unless there's no damaging move that deals at least neutral damage
 AIMoveChoiceModification3:
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;joenote - kick out if no-attack bit is set
+	ld a, [wUnusedC000]
+	bit 2, a
+	ret nz
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	ld hl, wBuffer - 1 ; temp move selection array (-1 byte offset)
 	ld de, wEnemyMonMoves ; enemy moves
 	ld b, NUM_MOVES + 1
@@ -201,20 +216,118 @@ AIMoveChoiceModification3:
 	ret z ; no more moves in move set
 	inc de
 	call ReadMove
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;	
+;don't use poison-effect moves on poison-tpe pokemon
+	ld a, [wEnemyMoveEffect]
+	cp POISON_EFFECT
+	jr nz, .notpoisoneffect
+	ld a, [wBattleMonType]
+	cp POISON
+	jp z, .heavydiscourage2
+	ld a, [wBattleMonType + 1]
+	cp POISON
+	jp z, .heavydiscourage2
+.notpoisoneffect
+;check on certain moves with zero bp but are handled differently
+	ld a, [wEnemyMoveNum]
+	push hl
+	push de
+	push bc
+	ld hl, SpecialZeroBPMoves
+	ld de, $0001
+	call IsInArray	;see if a is found in the hl array (carry flag set if true)
+	pop bc
+	pop de
+	pop hl
+	jp c, .specialBPend	;If found on list, treat it as if it were a damaging move
+
+	;otherise only handle moves that deal damage from here on out
+	ld a, [wEnemyMovePower]
+	and a
+	jp z, .nextMove	;go to next move if the current move is zero-power
+.specialBPend
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;joenote - heavily discourage attack moves that have no effect due to typing
 	push hl
 	push bc
 	push de
+	;reset type-effectiveness bit before calling function
+	ld a, [wUnusedC000]
+	res 3, a 
+	ld [wUnusedC000], a
 	callfar AIGetTypeEffectiveness
 	pop de
 	pop bc
 	pop hl
+
+	ld a, [wTypeEffectiveness]	;get the effectiveness
+	and a 	;check if it's zero
+	jr nz, .skipout2	;skip if it's not immune
+.heavydiscourage2	;at this line the move has no effect due to immunity or other circumstance
+	ld a, [hl]	
+	add $5 ; heavily discourage move
+	ld [hl], a
+	jp .nextMove
+.skipout2
+	;if thunder wave is being used against a non-immune target, neither encourage nor discourage it
+	ld a, [wEnemyMoveNum]
+	cp THUNDER_WAVE
+	jp z, .nextMove
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;	
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;joenote - do not use ohko moves on faster opponents, since they will auto-miss
+	ld a, [wEnemyMoveEffect]	;load the move effect
+	cp OHKO_EFFECT	;see if it is ohko move
+	jr nz, .skipout3	;skip ahead if not ohko move
+	call StrCmpSpeed	;do a speed compare
+	jp c, .nextMove	;ai is fast enough so ohko move viable
+	;else ai is slower so don't bother
+	jp .heavydiscourage2
+.skipout3	
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;joenote: static damage value moves should not be accounted for typing
+;at the same time, randomly bump their preference to spice things up
+	ld a, [wEnemyMovePower]	;get the base power of the enemy's attack
+	cp $1	;check if it is 1. special damage moves assumed to have 1 base power
+	jr nz, .skipout4	;skip down if it's not a special damage move
+	call Random	;else get a random number between 0 and 255
+	cp $40	
+	jp c, .givepref	;(25% chance) slightly encourage
+	jp .nextMove	;else neither encourage nor discourage
+.skipout4
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;jump if the move is not very effective
 	ld a, [wTypeEffectiveness]
-	cp $10
-	jr z, .nextMove
+	cp $0A
 	jr c, .notEffectiveMove
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;if the type effectiveness is neutral, apply slight preference if there is STAB
+	jr nz, .notneutraleffective	
+	push bc
+	ld a, [wEnemyMoveType]
+	ld b, a
+	ld a, [wEnemyMonType1]
+	cp b
+	pop bc
+	jp z, .givepref
+	push bc
+	ld a, [wEnemyMoveType]
+	ld b, a
+	ld a, [wEnemyMonType2]
+	cp b
+	pop bc
+	jp z, .givepref
+	jp .nextMove
+.notneutraleffective
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	;at this line, move is super effective
+.givepref	;joenote - added marker
 	dec [hl] ; slightly encourage this move
-	jr .nextMove
-.notEffectiveMove ; discourages non-effective moves if better moves are available
+	jp .nextMove
+.notEffectiveMove ; discourages non-effective moves if better moves are available 
 	push hl
 	push de
 	push bc
@@ -235,8 +348,6 @@ AIMoveChoiceModification3:
 	jr z, .betterMoveFound ; Super Fang is considered to be a better move
 	cp SPECIAL_DAMAGE_EFFECT
 	jr z, .betterMoveFound ; any special damage moves are considered to be better moves
-	cp FLY_EFFECT
-	jr z, .betterMoveFound ; Fly is considered to be a better move
 	ld a, [wEnemyMoveType]
 	cp d
 	jr z, .loopMoves
@@ -252,12 +363,94 @@ AIMoveChoiceModification3:
 	pop de
 	pop hl
 	and a
-	jr z, .nextMove
+	jp z, .nextMove
 	inc [hl] ; slightly discourage this move
-	jr .nextMove
-AIMoveChoiceModification4:
-	ret
+	jp .nextMove
 
+
+SpecialZeroBPMoves:	;joenote - added this table to tracks 0 bp moves that should not be treated as buffs
+	db BIDE
+	db METRONOME
+	db THUNDER_WAVE
+	db $FF
+
+; AI will make smarter descisions with recovery moves and boom moves
+AIMoveChoiceModification4:
+	ld hl, wBuffer - 1 ; temp move selection array (-1 byte offset)
+	ld de, wEnemyMonMoves ; enemy moves
+	ld b, NUM_MOVES + 1
+.nextMove
+	dec b
+	ret z ; processed all 4 moves
+	inc hl
+	ld a, [de]
+	and a
+	ret z ; no more moves in move set
+	inc de
+	call ReadMove
+	;Heavily discourage healing or exploding moves if HP is full. Encourage if hp is low
+	;Exploding has a slight preference over healing because overall this hurts the player more than the AI
+	ld a, [wEnemyMoveEffect]	;load the move effect
+	cp HEAL_EFFECT	;see if it is a healing move
+	jr z, .heal_explode	;skip out if move is not
+	cp EXPLODE_EFFECT	;what about an explosion effect?
+	jr nz, .nextMove ;get next move if it isn't
+	dec [hl]
+
+	;since this is an explosion effect, it would be good to heavily discourage if
+	;the opponent is in fly/dig state and the exploder is for-sure faster than the opponent
+	ld a, [wPlayerBattleStatus1]
+	bit 6, a
+	jr z, .heal_explode	;proceed as normal if player is not in fly/dig
+	call StrCmpSpeed	;do a speed compare
+	jp c, .heavydiscourage	;a set carry bit means the ai 'mon is faster, so heavily discourage
+	
+.heal_explode
+	ld a, 1	;
+	call AICheckIfHPBelowFraction
+	jp nc, .heavydiscourage	;heavy discourage if hp at max (heal +5 & explode +4)
+	inc [hl]	;1/2 hp to max hp - slight discourage (heal +1 & explode 0)
+	ld a, 2	;
+	call AICheckIfHPBelowFraction
+	jp nc, .nextMove	;if hp is 1/2 or more, get next move
+	dec [hl]	;else 1/3 to 1/2 hp - neutral (heal 0 & explode -1)
+	ld a, 3	;
+	call AICheckIfHPBelowFraction
+	jp nc, .nextMove	;if hp is 1/3 or more, get next move
+	dec [hl]	;else 0 to 1/3 hp - slight preference (heal -1 & explode -2)
+	jp .nextMove	;get next move
+
+.heavydiscourage
+	ld a, [hl]
+	add $5 ; heavily discourage move
+	ld [hl], a
+	jp .nextMove
+;	ret
+
+StrCmpSpeed:	;joenote - function for AI to compare pkmn speeds
+	push bc
+	push de
+	push hl
+	ld de, wBattleMonSpeed ; player speed value
+	ld hl, wEnemyMonSpeed ; enemy speed value
+	ld c, $2	;bytes to copy
+.spdcmploop	
+	ld a, [de]	
+	cp [hl]
+	jr nz, .return
+	inc de
+	inc hl
+	dec c
+	jr nz, .spdcmploop
+	;At this point:
+	;zero flag set means speeds equal
+	;carry flag not set means player pkmn faster
+	;carry flag set means ai pkmn faster
+.return
+	pop hl
+	pop de
+	pop bc
+	ret
 ReadMove:
 	push hl
 	push de
@@ -334,124 +527,12 @@ JugglerAI:
 	cp 25 percent + 1
 	ret nc
 	jp AISwitchIfEnoughMons
-
-BlackbeltAI:
-	cp 13 percent - 1
-	ret nc
-	jp AIUseXAttack
-
-GiovanniAI:
-	cp 25 percent + 1
-	ret nc
-	jp AIUseGuardSpec
-
-CooltrainerMAI:
-	cp 25 percent + 1
-	ret nc
-	jp AIUseXAttack
-
-CooltrainerFAI:
-	; The intended 25% chance to consider switching will not apply.
-	; Uncomment the line below to fix this.
-	cp 25 percent + 1
-	; ret nc
-	ld a, 10
-	call AICheckIfHPBelowFraction
-	jp c, AIUseHyperPotion
-	ld a, 5
-	call AICheckIfHPBelowFraction
-	ret nc
-	jp AISwitchIfEnoughMons
-
 BrockAI:
 ; if his active monster has a status condition, use a full heal
 	ld a, [wEnemyMonStatus]
 	and a
 	ret z
 	jp AIUseFullHeal
-
-MistyAI:
-	cp 25 percent + 1
-	ret nc
-	jp AIUseXDefend
-
-LtSurgeAI:
-	cp 25 percent + 1
-	ret nc
-	jp AIUseXSpeed
-
-ErikaAI:
-	cp 50 percent + 1
-	ret nc
-	ld a, 10
-	call AICheckIfHPBelowFraction
-	ret nc
-	jp AIUseSuperPotion
-
-KogaAI:
-	cp 13 percent - 1
-	ret nc
-	jp AIUseXAttack
-
-BlaineAI:
-	cp 25 percent + 1
-	ret nc
-	ld a, 10
-	call AICheckIfHPBelowFraction
-	ret nc
-	jp AIUseSuperPotion
-
-SabrinaAI:
-	cp 25 percent + 1
-	ret nc
-	jp AIUseXDefend
-
-Rival2AI:
-	cp 13 percent - 1
-	ret nc
-	ld a, 5
-	call AICheckIfHPBelowFraction
-	ret nc
-	jp AIUsePotion
-
-Rival3AI:
-	cp 13 percent - 1
-	ret nc
-	ld a, 5
-	call AICheckIfHPBelowFraction
-	ret nc
-	jp AIUseFullRestore
-
-LoreleiAI:
-	cp 50 percent + 1
-	ret nc
-	ld a, 5
-	call AICheckIfHPBelowFraction
-	ret nc
-	jp AIUseSuperPotion
-
-BrunoAI:
-	cp 25 percent + 1
-	ret nc
-	jp AIUseXDefend
-
-AgathaAI:
-	cp 8 percent
-	jp c, AISwitchIfEnoughMons
-	cp 50 percent + 1
-	ret nc
-	ld a, 4
-	call AICheckIfHPBelowFraction
-	ret nc
-	jp AIUseSuperPotion
-
-LanceAI:
-	cp 50 percent + 1
-	ret nc
-	ld a, 5
-	call AICheckIfHPBelowFraction
-	ret nc
-	jp AIUseHyperPotion
 
 GenericAI:
 	and a ; clear carry
@@ -468,89 +549,6 @@ DecrementAICount:
 AIPlayRestoringSFX:
 	ld a, SFX_HEAL_AILMENT
 	jp PlaySoundWaitForCurrent
-
-AIUseFullRestore:
-	call AICureStatus
-	ld a, FULL_RESTORE
-	ld [wAIItem], a
-	ld de, wHPBarOldHP
-	ld hl, wEnemyMonHP + 1
-	ld a, [hld]
-	ld [de], a
-	inc de
-	ld a, [hl]
-	ld [de], a
-	inc de
-	ld hl, wEnemyMonMaxHP + 1
-	ld a, [hld]
-	ld [de], a
-	inc de
-	ld [wHPBarMaxHP], a
-	ld [wEnemyMonHP + 1], a
-	ld a, [hl]
-	ld [de], a
-	ld [wHPBarMaxHP+1], a
-	ld [wEnemyMonHP], a
-	jr AIPrintItemUseAndUpdateHPBar
-
-AIUsePotion:
-; enemy trainer heals his monster with a potion
-	ld a, POTION
-	ld b, 20
-	jr AIRecoverHP
-
-AIUseSuperPotion:
-; enemy trainer heals his monster with a super potion
-	ld a, SUPER_POTION
-	ld b, 50
-	jr AIRecoverHP
-
-AIUseHyperPotion:
-; enemy trainer heals his monster with a hyper potion
-	ld a, HYPER_POTION
-	ld b, 200
-	; fallthrough
-
-AIRecoverHP:
-; heal b HP and print "trainer used $(a) on pokemon!"
-	ld [wAIItem], a
-	ld hl, wEnemyMonHP + 1
-	ld a, [hl]
-	ld [wHPBarOldHP], a
-	add b
-	ld [hld], a
-	ld [wHPBarNewHP], a
-	ld a, [hl]
-	ld [wHPBarOldHP+1], a
-	ld [wHPBarNewHP+1], a
-	jr nc, .next
-	inc a
-	ld [hl], a
-	ld [wHPBarNewHP+1], a
-.next
-	inc hl
-	ld a, [hld]
-	ld b, a
-	ld de, wEnemyMonMaxHP + 1
-	ld a, [de]
-	dec de
-	ld [wHPBarMaxHP], a
-	sub b
-	ld a, [hli]
-	ld b, a
-	ld a, [de]
-	ld [wHPBarMaxHP+1], a
-	sbc b
-	jr nc, AIPrintItemUseAndUpdateHPBar
-	inc de
-	ld a, [de]
-	dec de
-	ld [hld], a
-	ld [wHPBarNewHP], a
-	ld a, [de]
-	ld [hl], a
-	ld [wHPBarNewHP+1], a
-	; fallthrough
 
 AIPrintItemUseAndUpdateHPBar:
 	call AIPrintItemUse_
@@ -644,27 +642,6 @@ AICureStatus:
 	res 0, [hl]
 	ret
 
-AIUseXAccuracy: ; unused
-	call AIPlayRestoringSFX
-	ld hl, wEnemyBattleStatus2
-	set 0, [hl]
-	ld a, X_ACCURACY
-	jp AIPrintItemUse
-
-AIUseGuardSpec:
-	call AIPlayRestoringSFX
-	ld hl, wEnemyBattleStatus2
-	set 1, [hl]
-	ld a, GUARD_SPEC
-	jp AIPrintItemUse
-
-AIUseDireHit: ; unused
-	call AIPlayRestoringSFX
-	ld hl, wEnemyBattleStatus2
-	set 2, [hl]
-	ld a, DIRE_HIT
-	jp AIPrintItemUse
-
 AICheckIfHPBelowFraction:
 ; return carry if enemy trainer's current HP is below 1 / a of the maximum
 	ldh [hDivisor], a
@@ -690,48 +667,6 @@ AICheckIfHPBelowFraction:
 	ld a, e
 	sub c
 	ret
-
-AIUseXAttack:
-	ld b, $A
-	ld a, X_ATTACK
-	jr AIIncreaseStat
-
-AIUseXDefend:
-	ld b, $B
-	ld a, X_DEFEND
-	jr AIIncreaseStat
-
-AIUseXSpeed:
-	ld b, $C
-	ld a, X_SPEED
-	jr AIIncreaseStat
-
-AIUseXSpecial:
-	ld b, $D
-	ld a, X_SPECIAL
-	; fallthrough
-
-AIIncreaseStat:
-	ld [wAIItem], a
-	push bc
-	call AIPrintItemUse_
-	pop bc
-	ld hl, wEnemyMoveEffect
-	ld a, [hld]
-	push af
-	ld a, [hl]
-	push af
-	push hl
-	ld a, ANIM_AF
-	ld [hli], a
-	ld [hl], b
-	callfar StatModifierUpEffect
-	pop hl
-	pop af
-	ld [hli], a
-	pop af
-	ld [hl], a
-	jp DecrementAICount
 
 AIPrintItemUse:
 	ld [wAIItem], a
