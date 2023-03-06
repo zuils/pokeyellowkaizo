@@ -488,7 +488,7 @@ BlackbeltData:
 
 Rival1Data:
 ; Oak's Lab
-	db 5, EEVEE, 0
+	db  5, EEVEE, 0
 ; Route 22
 	db $FF, 9, SPEAROW, 8, EEVEE, 0
 ; Cerulean City

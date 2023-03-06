@@ -40,7 +40,7 @@ AttackAnimationPointers:
 	dw DoubleEdgeAnim
 	dw TailWhipAnim
 	dw PoisonStingAnim
-	dw TwineedleAnim
+	dw XScissorAnim
 	dw PinMissileAnim
 	dw LeerAnim
 	dw BiteAnim
@@ -70,7 +70,7 @@ AttackAnimationPointers:
 	dw CounterAnim
 	dw SeismicTossAnim
 	dw StrengthAnim
-	dw AbsorbAnim
+	dw GigaDrainAnim
 	dw MegaDrainAnim
 	dw LeechSeedAnim
 	dw GrowthAnim
@@ -121,7 +121,7 @@ AttackAnimationPointers:
 	dw MirrorMoveAnim
 	dw SelfdestructAnim
 	dw EggBombAnim
-	dw LickAnim
+	dw ShadowBallAnim
 	dw SmogAnim
 	dw SludgeAnim
 	dw BoneClubAnim
@@ -138,7 +138,7 @@ AttackAnimationPointers:
 	dw HiJumpKickAnim
 	dw GlareAnim
 	dw DreamEaterAnim
-	dw PoisonGasAnim
+	dw SludgeBombAnim
 	dw BarrageAnim
 	dw LeechLifeAnim
 	dw LovelyKissAnim
@@ -431,9 +431,8 @@ PoisonStingAnim:
 	battle_anim POISON_STING, SUBANIM_0_STAR, 0, 6
 	db -1 ; end
 
-TwineedleAnim:
-	battle_anim TWINEEDLE, SUBANIM_0_STAR_TWICE, 0, 5
-	battle_anim TWINEEDLE, SUBANIM_0_STAR_TWICE, 0, 5
+XScissorAnim:
+	battle_anim SLASH, SUBANIM_0_SCRATCHES, 0, 6
 	db -1 ; end
 
 PinMissileAnim:
@@ -601,10 +600,12 @@ StrengthAnim:
 	battle_anim FIRE_PUNCH, SUBANIM_1_STAR_BIG_MOVING, 1, 6
 	db -1 ; end
 
-AbsorbAnim:
-	battle_anim ABSORB, SE_LIGHT_SCREEN_PALETTE
+GigaDrainAnim:
+	battle_anim MEGA_DRAIN, SE_LIGHT_SCREEN_PALETTE
+	battle_anim NO_MOVE, SE_DARK_SCREEN_FLASH
 	battle_anim NO_MOVE, SUBANIM_0_CIRCLES_1_SQUARES_CENTERING_ENEMY, 0, 6
 	battle_anim NO_MOVE, SUBANIM_0_CIRCLE_1_SQUARE_TOSS_BACK, 0, 6
+	battle_anim NO_MOVE, SE_DARK_SCREEN_FLASH
 	battle_anim NO_MOVE, SE_RESET_SCREEN_PALETTE
 	db -1 ; end
 
@@ -906,8 +907,9 @@ EggBombAnim:
 	battle_anim EGG_BOMB, SUBANIM_1_EXPLOSION_SMALL_ENEMY, 1, 4
 	db -1 ; end
 
-LickAnim:
-	battle_anim SLUDGE, SUBANIM_1_BLOB_DRIP_ENEMY, 1, 6
+ShadowBallAnim:
+	battle_anim EGG_BOMB, SUBANIM_1_CIRCLE_BLACK_TOSS, 1, 4
+	battle_anim EGG_BOMB, SUBANIM_1_EXPLOSION_SMALL_ENEMY, 1, 4
 	db -1 ; end
 
 SmogAnim:
@@ -1000,8 +1002,9 @@ DreamEaterAnim:
 	battle_anim NO_MOVE, SE_RESET_SCREEN_PALETTE
 	db -1 ; end
 
-PoisonGasAnim:
-	battle_anim POISON_GAS, SUBANIM_1_CLOUD_TOSS, 1, 6
+SludgeBombAnim:
+	battle_anim SLUDGE, SUBANIM_1_BLOB_TOSS, 1, 6
+	battle_anim SLUDGE, SUBANIM_1_BLOB_DRIP_ENEMY, 1, 6
 	db -1 ; end
 
 BarrageAnim:

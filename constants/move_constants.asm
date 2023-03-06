@@ -46,7 +46,7 @@
 	const DOUBLE_EDGE  ; 26
 	const TAIL_WHIP    ; 27
 	const POISON_STING ; 28
-	const TWINEEDLE    ; 29
+	const X_SCISSOR    ; 29
 	const PIN_MISSILE  ; 2a
 	const LEER         ; 2b
 	const BITE         ; 2c
@@ -76,7 +76,7 @@
 	const COUNTER      ; 44
 	const SEISMIC_TOSS ; 45
 	const STRENGTH     ; 46
-	const ABSORB       ; 47
+	const GIGA_DRAIN   ; 47
 	const MEGA_DRAIN   ; 48
 	const LEECH_SEED   ; 49
 	const GROWTH       ; 4a
@@ -127,7 +127,7 @@
 	const MIRROR_MOVE  ; 77
 	const SELFDESTRUCT ; 78
 	const EGG_BOMB     ; 79
-	const LICK         ; 7a
+	const SHADOW_BALL  ; 7a
 	const SMOG         ; 7b
 	const SLUDGE       ; 7c
 	const BONE_CLUB    ; 7d
@@ -144,7 +144,7 @@
 	const HI_JUMP_KICK ; 88
 	const GLARE        ; 89
 	const DREAM_EATER  ; 8a
-	const POISON_GAS   ; 8b
+	const SLUDGE_BOMB   ; 8b
 	const BARRAGE      ; 8c
 	const LEECH_LIFE   ; 8d
 	const LOVELY_KISS  ; 8e

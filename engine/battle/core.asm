@@ -519,7 +519,7 @@ HandlePoisonBurnLeechSeed:
 	ldh [hWhoseTurn], a
 	xor a
 	ld [wAnimationType], a
-	ld a, ABSORB
+	ld a, GIGA_DRAIN
 	call PlayMoveAnimation ; play leech seed animation (from opposing mon)
 	pop af
 	ldh [hWhoseTurn], a
@@ -4035,33 +4035,36 @@ PrintMoveFailureText:
 	ret nz
 
 	; if you get here, the mon used jump kick or hi jump kick and missed
-	ld hl, wDamage ; since the move missed, wDamage will always contain 0 at this point.
-	                ; Thus, recoil damage will always be equal to 1
-	                ; even if it was intended to be potential damage/8.
-	ld a, [hli]
-	ld b, [hl]
-	srl a
-	rr b
-	srl a
-	rr b
-	srl a
-	rr b
-	ld [hl], b
-	dec hl
-	ld [hli], a
-	or b
-	jr nz, .applyRecoil
-	inc a
-	ld [hl], a
+    ; make the miss do 1/4 max hp in damage
+    ld hl, wBattleMonMaxHP
+    ldh a, [hWhoseTurn]
+    and a
+    jr z, .usedJumpKick
+    ld hl, wEnemyMonMaxHP
+.usedJumpKick
+    ld a, [hli]
+    ld b, [hl]
+    ld hl, wDamage + 1
+    srl a
+    rr b
+    srl a
+    rr b
+    ld [hl], b
+    dec hl
+    ld [hli], a
+    or b
+    jr nz, .applyRecoil
+    inc a
+    ld [hl], a
 .applyRecoil
-	ld hl, KeptGoingAndCrashedText
-	call PrintText
-	ld b, $4
-	predef PredefShakeScreenHorizontally
-	ldh a, [hWhoseTurn]
-	and a
-	jr nz, .enemyTurn
-	jp ApplyDamageToPlayerPokemon
+    ld hl, KeptGoingAndCrashedText
+    call PrintText
+    ld b, $4
+    predef PredefShakeScreenHorizontally
+    ldh a, [hWhoseTurn]
+    and a
+    jr nz, .enemyTurn
+    jp ApplyDamageToPlayerPokemon
 .enemyTurn
 	jp ApplyDamageToEnemyPokemon
 

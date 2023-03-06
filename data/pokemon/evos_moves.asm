@@ -340,7 +340,7 @@ GrimerEvosMoves:
 	db EV_LEVEL, 38, MUK
 	db 0
 ; Learnset
-	db 30, POISON_GAS
+	db 30, SLUDGE_BOMB
 	db 33, MINIMIZE
 	db 37, SLUDGE
 	db 42, HARDEN
@@ -538,7 +538,7 @@ TangelaEvosMoves:
 	db 0
 ; Learnset
 	db 24, BIND
-	db 27, ABSORB
+	db 27, GIGA_DRAIN
 	db 29, VINE_WHIP
 	db 32, POISONPOWDER
 	db 36, STUN_SPORE
@@ -745,7 +745,7 @@ DrowzeeEvosMoves:
 	db 12, DISABLE
 	db 17, CONFUSION
 	db 24, HEADBUTT
-	db 29, POISON_GAS
+	db 29, SLUDGE_BOMB
 	db 32, PSYCHIC_M
 	db 37, MEDITATE
 	db 0
@@ -979,7 +979,7 @@ JynxEvosMoves:
 ; Evolutions
 	db 0
 ; Learnset
-	db 18, LICK
+	db 18, SHADOW_BALL
 	db 23, DOUBLESLAP
 	db 31, ICE_PUNCH
 	db 39, BODY_SLAM
@@ -1143,7 +1143,7 @@ KabutoEvosMoves:
 	db EV_LEVEL, 40, KABUTOPS
 	db 0
 ; Learnset
-	db 34, ABSORB
+	db 34, GIGA_DRAIN
 	db 39, SLASH
 	db 44, LEER
 	db 49, HYDRO_PUMP
@@ -1153,7 +1153,7 @@ KabutopsEvosMoves:
 ; Evolutions
 	db 0
 ; Learnset
-	db 34, ABSORB
+	db 34, GIGA_DRAIN
 	db 39, SLASH
 	db 46, LEER
 	db 53, HYDRO_PUMP
@@ -1405,7 +1405,7 @@ BeedrillEvosMoves:
 ; Learnset
 	db 12, FURY_ATTACK
 	db 16, FOCUS_ENERGY
-	db 20, TWINEEDLE
+	db 20, X_SCISSOR
 	db 25, RAGE
 	db 30, PIN_MISSILE
 	db 35, AGILITY
@@ -1553,7 +1553,7 @@ HypnoEvosMoves:
 	db 12, DISABLE
 	db 17, CONFUSION
 	db 24, HEADBUTT
-	db 33, POISON_GAS
+	db 33, SLUDGE_BOMB
 	db 37, PSYCHIC_M
 	db 43, MEDITATE
 	db 0
@@ -1614,7 +1614,7 @@ MukEvosMoves:
 ; Evolutions
 	db 0
 ; Learnset
-	db 30, POISON_GAS
+	db 30, SLUDGE_BOMB
 	db 33, MINIMIZE
 	db 37, SLUDGE
 	db 45, HARDEN
