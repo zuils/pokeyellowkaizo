@@ -4,13 +4,13 @@
 	;   hp  atk  def  spd  spc
 
 	db POISON, POISON ; type
-	db 235 ; catch rate
+	db 255 ; catch rate
 	db 60 ; base exp
 
 	INCBIN "gfx/pokemon/front/nidoranm.pic", 0, 1 ; sprite dimensions
 	dw NidoranMPicFront, NidoranMPicBack
 
-	db LEER, TACKLE, NO_MOVE, NO_MOVE ; level 1 learnset
+	db DOUBLE_KICK, HORN_ATTACK, TOXIC, NO_MOVE ; level 1 learnset
 	db GROWTH_MEDIUM_SLOW ; growth rate
 
 	; tm/hm learnset
