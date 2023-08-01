@@ -3714,8 +3714,8 @@ CheckPlayerStatusConditions:
 	jp .returnToHL
 
 .MultiturnMoveCheck
-	; bit USING_TRAPPING_MOVE, [hl] ; is mon using multi-turn move?
-	; jp z, .RageCheck
+	bit USING_TRAPPING_MOVE, [hl] ; is mon using multi-turn move?
+	jp z, .RageCheck
 	ld hl, AttackContinuesText
 	call PrintText
 	ld a, [wPlayerNumAttacksLeft]
@@ -3725,20 +3725,18 @@ CheckPlayerStatusConditions:
 	                ; DecrementPP and MoveHitTest
 	jp nz, .returnToHL
 	jp .returnToHL
-
-
-;.RageCheck
-;	ld a, [wPlayerBattleStatus2]
-;	bit USING_RAGE, a ; is mon using rage?
-;	jp z, .checkPlayerStatusConditionsDone ; if we made it this far, mon can move normally this turn
-;	ld a, RAGE
-;	ld [wd11e], a
-;	call GetMoveName
-;	call CopyToStringBuffer
-;	xor a
-;	ld [wPlayerMoveEffect], a
-;	ld hl, PlayerCanExecuteMove
-;	jp .returnToHL
+.RageCheck
+	ld a, [wPlayerBattleStatus2]
+	bit USING_RAGE, a ; is mon using rage?
+	jp z, .checkPlayerStatusConditionsDone ; if we made it this far, mon can move normally this turn
+	; ld a, RAGE
+	ld [wd11e], a
+	call GetMoveName
+	call CopyToStringBuffer
+	xor a
+	ld [wPlayerMoveEffect], a
+	ld hl, PlayerCanExecuteMove
+	jp .returnToHL
 
 .returnToHL
 	xor a
@@ -6235,8 +6233,8 @@ CheckEnemyStatusConditions:
 	pop hl ; skip DecrementPP
 	jp .enemyReturnToHL
 .checkIfUsingMultiturnMove
-	; bit USING_TRAPPING_MOVE, [hl] ; is mon using multi-turn move?
-	; jp z, .checkIfUsingRage
+	bit USING_TRAPPING_MOVE, [hl] ; is mon using multi-turn move?
+	jp z, .checkIfUsingRage
 	ld hl, AttackContinuesText
 	call PrintText
 	ld hl, wEnemyNumAttacksLeft
@@ -6245,18 +6243,18 @@ CheckEnemyStatusConditions:
 	                             ; DecrementPP and MoveHitTest
 	jp nz, .enemyReturnToHL
 	jp .enemyReturnToHL
-; .checkIfUsingRage
-; 	ld a, [wEnemyBattleStatus2]
-; 	bit USING_RAGE, a ; is mon using rage?
-; 	jp z, .checkEnemyStatusConditionsDone ; if we made it this far, mon can move normally this turn
-; 	ld a, RAGE
-; 	ld [wd11e], a
-; 	call GetMoveName
-; 	call CopyToStringBuffer
-; 	xor a
-; 	ld [wEnemyMoveEffect], a
-; 	ld hl, EnemyCanExecuteMove
-; 	jp .enemyReturnToHL
+.checkIfUsingRage
+	ld a, [wEnemyBattleStatus2]
+	bit USING_RAGE, a ; is mon using rage?
+	jp z, .checkEnemyStatusConditionsDone ; if we made it this far, mon can move normally this turn
+	; ld a, RAGE
+	ld [wd11e], a
+	call GetMoveName
+	call CopyToStringBuffer
+	xor a
+	ld [wEnemyMoveEffect], a
+	ld hl, EnemyCanExecuteMove
+	jp .enemyReturnToHL
 .enemyReturnToHL
 	xor a ; set Z flag
 	ret
