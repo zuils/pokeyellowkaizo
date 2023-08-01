@@ -36,7 +36,8 @@ SubstituteEffect_:
 	ld a, [hl]
 	sbc 0
 	pop bc
-	jr z, .notEnoughHP ; underflow means user would be left with negative health
+	jr c, .notEnoughHP ; underflow means user would be left with negative health
+					   ; bug: since it only branches on carry, it will possibly leave user with 0 HP
 .userHasZeroOrMoreHP
 	ldi [hl], a ; save resulting HP after subtraction into current HP
 	ld [hl], d
