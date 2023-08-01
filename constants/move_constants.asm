@@ -104,7 +104,7 @@
 	const MEDITATE     ; 60
 	const AGILITY      ; 61
 	const QUICK_ATTACK ; 62
-	const RAGE         ; 63
+	const SHADOW_BALL  ; 63
 	const TELEPORT     ; 64
 	const NIGHT_SHADE  ; 65
 	const MIMIC        ; 66
@@ -127,7 +127,7 @@
 	const MIRROR_MOVE  ; 77
 	const SELFDESTRUCT ; 78
 	const EGG_BOMB     ; 79
-	const SHADOW_BALL  ; 7a
+	const LICK		   ; 7a
 	const SMOG         ; 7b
 	const SLUDGE       ; 7c
 	const BONE_CLUB    ; 7d

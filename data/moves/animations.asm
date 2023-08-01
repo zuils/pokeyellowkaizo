@@ -98,7 +98,7 @@ AttackAnimationPointers:
 	dw MeditateAnim
 	dw AgilityAnim
 	dw QuickAttackAnim
-	dw RageAnim
+	dw ShadowBallAnim
 	dw TeleportAnim
 	dw NightShadeAnim
 	dw MimicAnim
@@ -121,7 +121,7 @@ AttackAnimationPointers:
 	dw MirrorMoveAnim
 	dw SelfdestructAnim
 	dw EggBombAnim
-	dw ShadowBallAnim
+	dw LickAnim
 	dw SmogAnim
 	dw SludgeAnim
 	dw BoneClubAnim
@@ -756,8 +756,9 @@ QuickAttackAnim:
 	battle_anim NO_MOVE, SE_SHOW_MON_PIC
 	db -1 ; end
 
-RageAnim:
-	battle_anim RAGE, SUBANIM_0_STAR_TWICE, 0, 6
+ShadowBallAnim:
+	battle_anim EGG_BOMB, SUBANIM_1_CIRCLE_BLACK_TOSS, 1, 4
+	battle_anim EGG_BOMB, SUBANIM_1_EXPLOSION_SMALL_ENEMY, 1, 4
 	db -1 ; end
 
 TeleportAnim:
@@ -907,10 +908,10 @@ EggBombAnim:
 	battle_anim EGG_BOMB, SUBANIM_1_EXPLOSION_SMALL_ENEMY, 1, 4
 	db -1 ; end
 
-ShadowBallAnim:
-	battle_anim EGG_BOMB, SUBANIM_1_CIRCLE_BLACK_TOSS, 1, 4
-	battle_anim EGG_BOMB, SUBANIM_1_EXPLOSION_SMALL_ENEMY, 1, 4
+LickAnim:
+	battle_anim SLUDGE, SUBANIM_1_BLOB_DRIP_ENEMY, 1, 6
 	db -1 ; end
+
 
 SmogAnim:
 	battle_anim LEECH_SEED, SE_DARKEN_MON_PALETTE

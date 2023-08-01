@@ -390,7 +390,7 @@ CuboneEvosMoves:
 	db 31, FOCUS_ENERGY
 	db 38, THRASH
 	db 43, BONEMERANG
-	db 46, RAGE
+	db 46, SHADOW_BALL
 	db 0
 
 RhyhornEvosMoves:
@@ -439,7 +439,7 @@ GyaradosEvosMoves:
 	db 0
 ; Learnset
 	db 20, BITE
-	db 25, DRAGON_RAGE
+	db 25, 
 	db 32, LEER
 	db 41, HYDRO_PUMP
 	db 52, HYPER_BEAM
@@ -577,7 +577,7 @@ OnixEvosMoves:
 ; Learnset
 	db 15, BIND
 	db 19, ROCK_THROW
-	db 25, RAGE
+	db 25, SHADOW_BALL
 	db 33, SLAM
 	db 43, HARDEN
 	db 0
@@ -872,7 +872,7 @@ TaurosEvosMoves:
 	db 21, STOMP
 	db 28, TAIL_WHIP
 	db 35, LEER
-	db 44, RAGE
+	db 44, SHADOW_BALL
 	db 51, TAKE_DOWN
 	db 0
 
@@ -957,7 +957,7 @@ DoduoEvosMoves:
 	db 20, GROWL
 	db 24, FURY_ATTACK
 	db 30, DRILL_PECK
-	db 36, RAGE
+	db 36, SHADOW_BALL
 	db 40, TRI_ATTACK
 	db 44, AGILITY
 	db 0
@@ -1406,7 +1406,7 @@ BeedrillEvosMoves:
 	db 12, FURY_ATTACK
 	db 16, FOCUS_ENERGY
 	db 20, X_SCISSOR
-	db 25, RAGE
+	db 25, SHADOW_BALL
 	db 30, PIN_MISSILE
 	db 35, AGILITY
 	db 0
@@ -1424,7 +1424,7 @@ DodrioEvosMoves:
 	db 20, GROWL
 	db 24, FURY_ATTACK
 	db 30, DRILL_PECK
-	db 39, RAGE
+	db 39, SHADOW_BALL
 	db 45, TRI_ATTACK
 	db 51, AGILITY
 	db 0
@@ -1437,7 +1437,7 @@ PrimeapeEvosMoves:
 	db 15, KARATE_CHOP
 	db 21, FURY_SWIPES
 	db 27, FOCUS_ENERGY
-	db 28, RAGE
+	db 28, SHADOW_BALL
 	db 37, SEISMIC_TOSS
 	db 46, THRASH
 	db 45, SCREECH
@@ -1702,7 +1702,7 @@ MarowakEvosMoves:
 	db 33, FOCUS_ENERGY
 	db 41, THRASH
 	db 48, BONEMERANG
-	db 55, RAGE
+	db 55, SHADOW_BALL
 	db 0
 
 MissingNo92EvosMoves:
@@ -2009,7 +2009,7 @@ CharmanderEvosMoves:
 ; Learnset
 	db 9, EMBER
 	db 15, LEER
-	db 22, RAGE
+	db 22, SHADOW_BALL
 	db 30, SLASH
 	db 38, FLAMETHROWER
 	db 46, FIRE_SPIN
@@ -2035,7 +2035,7 @@ CharmeleonEvosMoves:
 ; Learnset
 	db 9, EMBER
 	db 15, LEER
-	db 24, RAGE
+	db 24, SHADOW_BALL
 	db 33, SLASH
 	db 42, FLAMETHROWER
 	db 56, FIRE_SPIN
@@ -2060,7 +2060,7 @@ CharizardEvosMoves:
 ; Learnset
 	db 9, EMBER
 	db 15, LEER
-	db 24, RAGE
+	db 24, SHADOW_BALL
 	db 36, SLASH
 	db 46, FLAMETHROWER
 	db 55, FIRE_SPIN
