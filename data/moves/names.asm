@@ -66,7 +66,7 @@ MoveNames::
 	li "PECK"
 	li "DRILL PECK"
 	li "SUBMISSION"
-	li "LOW KICK"
+	li "DRAGON CLAW"
 	li "COUNTER"
 	li "SEISMIC TOSS"
 	li "STRENGTH"

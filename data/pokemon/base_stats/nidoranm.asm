@@ -10,7 +10,7 @@
 	INCBIN "gfx/pokemon/front/nidoranm.pic", 0, 1 ; sprite dimensions
 	dw NidoranMPicFront, NidoranMPicBack
 
-	db DOUBLE_KICK, HORN_ATTACK, TOXIC, NO_MOVE ; level 1 learnset
+	db HORN_ATTACK, DOUBLE_KICK, TOXIC, NO_MOVE ; level 1 learnset
 	db GROWTH_MEDIUM_SLOW ; growth rate
 
 	; tm/hm learnset

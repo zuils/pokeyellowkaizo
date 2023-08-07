@@ -10,7 +10,7 @@
 	INCBIN "gfx/pokemon/front/nidoking.pic", 0, 1 ; sprite dimensions
 	dw NidokingPicFront, NidokingPicBack
 
-	db DOUBLE_KICK, HORN_ATTACK, TOXIC, DIG ; level 1 learnset
+	db THUNDERBOLT, BLIZZARD, EARTHQUAKE, LOVELY_KISS ; level 1 learnset
 	db GROWTH_MEDIUM_SLOW ; growth rate
 
 	; tm/hm learnset

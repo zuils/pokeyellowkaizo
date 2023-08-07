@@ -67,7 +67,7 @@ MoveSoundTable:
 	db SFX_PECK,               $01, $a0 ; PECK
 	db SFX_BATTLE_13,          $f0, $20 ; DRILL_PECK
 	db SFX_BATTLE_23,          $01, $c0 ; SUBMISSION
-	db SFX_BATTLE_23,          $00, $80 ; LOW_KICK
+	db SFX_BATTLE_23,          $00, $80 ; DRAGON_CLAW
 	db SFX_SUPER_EFFECTIVE,    $00, $e0 ; COUNTER
 	db SFX_BATTLE_26,          $01, $60 ; SEISMIC_TOSS
 	db SFX_BATTLE_26,          $20, $40 ; STRENGTH
