@@ -826,7 +826,7 @@ MissingNo3DEvosMoves:
 
 MissingNo3EEvosMoves:
 ; Evolutions
-	db 0wsw
+	db 0
 ; Learnset
 	db 0
 
@@ -1009,7 +1009,7 @@ PikachuEvosMoves:
 	db 0
 ; Learnset
 	db 10, HEADBUTT
-	db 16, THUNDER_PUNCH
+	db 16, THUNDERPUNCH
 	db 20, THUNDERBOLT
 	db 40, THUNDER
 	db 0

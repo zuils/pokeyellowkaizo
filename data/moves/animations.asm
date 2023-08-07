@@ -66,7 +66,7 @@ AttackAnimationPointers:
 	dw PeckAnim
 	dw DrillPeckAnim
 	dw SubmissionAnim
-	dw DragaonClawAnim
+	dw DragonClawAnim
 	dw CounterAnim
 	dw SeismicTossAnim
 	dw StrengthAnim
